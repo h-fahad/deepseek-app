@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@firebase/app": "^0.10.18",
     "@firebase/auth": "^1.8.2",
     "@firebase/firestore": "^4.7.6",
     "@reduxjs/toolkit": "^2.5.1",
