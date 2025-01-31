@@ -10,10 +10,18 @@ export async function getSubject(subjectId: string) {
 }
 
 // lib/api/firebase-client.ts
+// lib/api/firebase-client.ts
 export async function getAllSubjects(): Promise<Subject[]> {
-  const querySnapshot = await getDocs(collection(db, "subjects"));
-  return querySnapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data()
-  }) as Subject);
+  try {
+    const querySnapshot = await getDocs(collection(db, "subjects"));
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      name: doc.data().name || '',
+      icon: doc.data().icon || '📘',
+      sections: doc.data().sections || []
+    }) as Subject);
+  } catch (error) {
+    console.error('Error fetching subjects:', error);
+    return [];
+  }
 }

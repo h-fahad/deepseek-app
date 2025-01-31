@@ -18,7 +18,6 @@ export default function SubjectGrid() {
     const fetchSubjects = async () => {
       try {
         const data = await getAllSubjects();
-        console.log(data);
         setSubjects(data);
       } catch (err) {
         setError('Failed to load subjects');
@@ -58,26 +57,29 @@ const SubjectCard = ({ subject }: { subject: Subject }) => {
 
   useEffect(() => {
     const calculateProgress = async () => {
-      if (!user) return;
-      
-      // Get user progress from Firestore
-      const progressRef = collection(db, 'users', user.uid, 'progress');
-      const querySnapshot = await getDocs(progressRef);
-      
-      const totalTopics = subject.sections.reduce(
-        (acc, section) => acc + section.topics.length, 0
-      );
-      
-      const completedTopics = querySnapshot.docs.filter(doc => 
-        doc.data().status === 'completed'
-      ).length;
+      if (!user?.uid) return;
 
-      setProgress(Math.round((completedTopics / totalTopics) * 100));
+      try {
+        const progressRef = collection(db, 'users', user.uid, 'progress');
+        const querySnapshot = await getDocs(progressRef);
+
+        const totalTopics = subject.sections?.reduce(
+          (acc, section) => acc + (section.topics?.length || 0), 0
+        ) || 0;
+
+        const completedTopics = querySnapshot.docs.filter(doc =>
+          doc.data()?.status === 'completed'
+        ).length;
+
+        setProgress(totalTopics > 0 ? Math.round((completedTopics / totalTopics) * 100) : 0);
+      } catch (error) {
+        console.error('Progress calculation error:', error);
+      }
     };
 
     calculateProgress();
   }, [user, subject]);
-
+  
   return (
     <Link
       href={`/subjects/${subject.id}`}
@@ -85,9 +87,11 @@ const SubjectCard = ({ subject }: { subject: Subject }) => {
     >
       <div className="flex items-center gap-4 mb-4">
         <div className="p-3 bg-blue-100 rounded-lg text-2xl">
-          {subject.icon}
+          {subject.icon || '📚'} {/* Fallback icon */}
         </div>
-        <h3 className="text-lg font-semibold">{subject.name}</h3>
+        <h3 className="text-lg font-semibold">
+          {subject.name || 'Unnamed Subject'} {/* Fallback name */}
+        </h3>
       </div>
       <div className="flex items-center justify-between">
         <div className="w-full bg-gray-200 rounded-full h-2">
