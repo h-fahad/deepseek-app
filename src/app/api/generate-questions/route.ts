@@ -2,7 +2,7 @@
 import OpenAI from 'openai';
 import { NextResponse } from 'next/server';
 
-const openai = new OpenAI({ apiKey: process.env.NEXT_PUBLIC_FREE_PROXY_OPENAI! });
+const openai = new OpenAI({ apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY! });
 
 export async function POST(req: Request) {
   const { topic, difficulty = 'medium' } = await req.json();
